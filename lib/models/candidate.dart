@@ -6,6 +6,8 @@ class Candidate {
   String course;
   int graduationYear;
   bool available;
+  List<String> technicalSkills;
+  List<String> softSkills;
 
   //construtor
   Candidate({
@@ -15,6 +17,8 @@ class Candidate {
     required this.course,
     required this.available,
     required this.graduationYear,
+    required this.technicalSkills,
+    required this.softSkills,
   });
 
   static List<Candidate> candidates() {
@@ -26,6 +30,28 @@ class Candidate {
         course: "Técnico em Informática para internet",
         available: true,
         graduationYear: 2026,
+        technicalSkills: [
+          "HTML",
+          "TAILWINDCSS",
+          "JAVASCRIPT",
+          "TYPESCRIPT",
+          "PHP",
+          "REACT",
+          "NEXT.JS",
+          "NODE.JS",
+          "MYSQL",
+          "MONGODB",
+          "DEPLOY",
+          "ASSISTENTE ADMINISTRATIVO",
+          "DESIGNER GRÁFICO",
+        ],
+        softSkills: [
+          "Foco em resultados",
+          "Proativo",
+          "Facilidade em aprender",
+          "Pensamento crítico",
+          "Busca por inovação",
+        ],
       ),
 
       Candidate(
@@ -35,15 +61,33 @@ class Candidate {
         course: "Técnico em Informática para internet",
         available: true,
         graduationYear: 2026,
+        technicalSkills: [
+          "HTML",
+          "CSS",
+          "Javascript",
+          "PHP",
+          "IA",
+          "Informática básica",
+          "Recepção",
+        ],
+        softSkills: ["impaciente", "agilidosa", "competente", "responsável"],
       ),
 
       Candidate(
-        name: "João Pedro",
-        document: "1234567890",
+        name: "Joao pedro",
+        document: "01254125898",
         email: "joaopedro@gmail.com",
-        course: "Técnico em Informática para internet",
-        available: true,
+        course: "Tecnico em Informatica para Internet",
         graduationYear: 2026,
+        available: true,
+        technicalSkills: ["HTML", "CSS", "JavaScript", "Java", "PHP", "IA"],
+        softSkills: [
+          "Proativo",
+          "Organização de tarefas",
+          "Gestão do tempo",
+          "Planejamento",
+          "Criatividade",
+        ],
       ),
 
       Candidate(
@@ -53,6 +97,13 @@ class Candidate {
         course: "Tecnico em Informatica para Internet",
         graduationYear: 2026,
         available: false,
+        technicalSkills: ["PHP", "HTML/CSS", "Flutter", "Dart"],
+        softSkills: [
+          "Comunicação",
+          "Resolução de problemas",
+          "Adaptação",
+          "Liderança",
+        ],
       ),
 
       Candidate(
@@ -62,6 +113,8 @@ class Candidate {
         course: "Técnico em Informática para Internet",
         graduationYear: 2026,
         available: true,
+        technicalSkills: ["HTML", "CSS", "JAVASCRIPT", "PHP"],
+        softSkills: ["Pensamento Crítico", "Adaptabilidade", "Empatia"],
       ),
 
       Candidate(
@@ -71,6 +124,13 @@ class Candidate {
         course: "Técnico em Informática para Internet",
         graduationYear: 2026,
         available: false,
+        technicalSkills: [
+          "HTML",
+          "CSS",
+          "Javascript",
+          "Tecnico em Recursos Humanos",
+        ],
+        softSkills: ["Criativo", "Empatia", "Paciente"],
       ),
     ];
   }
