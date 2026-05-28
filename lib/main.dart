@@ -50,8 +50,8 @@ class _MyHomePageState extends State<MyHomePage> {
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 
             color: candidate.available
-                ? Colors.blue[200]
-                : Color.fromARGB(255, 245, 245, 245),
+                ? const Color.fromARGB(255, 203, 232, 255)
+                : Color.fromARGB(255, 238, 238, 238),
 
             child: Padding(
               padding: const EdgeInsets.all(10),
@@ -61,9 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: candidate.available
-                          ? Colors.blue[200]
-                          : Color.fromARGB(255, 218, 218, 218),
+                      backgroundColor: Color.fromARGB(255, 255, 255, 255),
                       child: Text(candidate.name[0]),
                     ),
 
