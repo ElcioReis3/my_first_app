@@ -46,6 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
         itemBuilder: (context, index) {
           final candidate = candidates[index];
 
+          Color titleColor = candidate.available
+              ? Colors.blueAccent
+              : Color.fromARGB(255, 48, 48, 48);
+
           return Card(
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
 
@@ -75,11 +79,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                   ),
 
-                  const Text(
+                  Text(
                     "Habilidades Técnicas",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.blueAccent,
+                      color: titleColor,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Poppins",
                     ),
@@ -107,11 +111,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     }).toList(),
                   ),
 
-                  const Text(
+                  Text(
                     "Características pessoais",
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.blueAccent,
+                      color: titleColor,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Poppins",
                     ),
