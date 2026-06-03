@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_app/models/candidate.dart';
+import 'package:my_first_app/provider/candidate_provider.dart';
+import 'package:provider/provider.dart';
 
 class CreateCandidateScreen extends StatefulWidget {
   const CreateCandidateScreen({super.key});
@@ -94,7 +96,7 @@ class _MyHomeScreenState extends State<CreateCandidateScreen> {
         softSkills: List.from(_softSkills),
       );
 
-      print(newCandidate.name);
+      context.read<CandidateProvider>().addCandidate(newCandidate);
 
       Navigator.pop(context);
     }
