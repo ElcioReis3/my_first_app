@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_first_app/models/candidate.dart';
+import 'package:my_first_app/provider/candidate_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:my_first_app/routes/app_routes.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -11,12 +12,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _MyHomeScreenState extends State<HomeScreen> {
-  List<Candidate> candidates = Candidate.candidates();
   final Set<int> _expandedTech = {};
   final Set<int> _expandedSoft = {};
 
   @override
   Widget build(BuildContext context) {
+    final candidates = context.watch<CandidateProvider>().candidates;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
       appBar: AppBar(
@@ -31,171 +33,204 @@ class _MyHomeScreenState extends State<HomeScreen> {
             fontSize: 18,
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: "Sair",
+            onPressed: () => context.go(AppRoutes.login),
+          ),
+        ],
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        itemCount: candidates.length,
-        itemBuilder: (context, index) {
-          final candidate = candidates[index];
-          final bool isAvailable = candidate.available;
-          final bool techExpanded = _expandedTech.contains(index);
-          final bool softExpanded = _expandedSoft.contains(index);
-
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isAvailable
-                    ? const Color(0xFF3A7BD5)
-                    : const Color(0xFFCBD5E0),
-                width: 1,
+      body: candidates.isEmpty
+          ? const Center(
+              child: Text(
+                "Nenhum candidato cadastrado.",
+                style: TextStyle(fontSize: 14, color: Color(0xFF718096)),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Cabeçalho
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: isAvailable
-                            ? const Color(0xFF3A7BD5)
-                            : const Color(0xFF90A4AE),
-                        child: Text(
-                          candidate.name[0],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              candidate.name,
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                fontFamily: "Poppins",
-                                color: Color(0xFF1E3A5F),
-                              ),
-                            ),
-                            Text(
-                              candidate.email,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Color(0xFF718096),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: isAvailable
-                              ? const Color(0xFFE8F4FD)
-                              : const Color(0xFFF1F5F9),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: isAvailable
-                                ? const Color(0xFF3A7BD5)
-                                : const Color(0xFFCBD5E0),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              isAvailable
-                                  ? Icons.check_circle_outline
-                                  : Icons.cancel_outlined,
-                              size: 13,
-                              color: isAvailable
-                                  ? const Color(0xFF3A7BD5)
-                                  : const Color(0xFF90A4AE),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              isAvailable ? "Disponível" : "Indisponível",
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: isAvailable
-                                    ? const Color(0xFF3A7BD5)
-                                    : const Color(0xFF90A4AE),
-                              ),
-                            ),
-                          ],
-                        ),
+            )
+          : ListView.builder(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              itemCount: candidates.length,
+              itemBuilder: (context, index) {
+                final candidate = candidates[index];
+                final bool isAvailable = candidate.available;
+                final bool techExpanded = _expandedTech.contains(index);
+                final bool softExpanded = _expandedSoft.contains(index);
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isAvailable
+                          ? const Color(0xFF3A7BD5)
+                          : const Color(0xFFCBD5E0),
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Cabeçalho
+                        Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: isAvailable
+                                  ? const Color(0xFF3A7BD5)
+                                  : const Color(0xFF90A4AE),
+                              child: Text(
+                                candidate.name[0],
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    candidate.name,
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: "Poppins",
+                                      color: Color(0xFF1E3A5F),
+                                    ),
+                                  ),
+                                  Text(
+                                    candidate.email,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF718096),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // Badge disponibilidade
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isAvailable
+                                    ? const Color(0xFFE8F4FD)
+                                    : const Color(0xFFF1F5F9),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isAvailable
+                                      ? const Color(0xFF3A7BD5)
+                                      : const Color(0xFFCBD5E0),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    isAvailable
+                                        ? Icons.check_circle_outline
+                                        : Icons.cancel_outlined,
+                                    size: 13,
+                                    color: isAvailable
+                                        ? const Color(0xFF3A7BD5)
+                                        : const Color(0xFF90A4AE),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    isAvailable ? "Disponível" : "Indisponível",
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: isAvailable
+                                          ? const Color(0xFF3A7BD5)
+                                          : const Color(0xFF90A4AE),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            // Botão editar
+                            GestureDetector(
+                              onTap: () => context.push(
+                                AppRoutes.editCandidate,
+                                extra: {'index': index, 'candidate': candidate},
+                              ),
+                              child: Container(
+                                padding: const EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFEBF4FF),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Icon(
+                                  Icons.edit_outlined,
+                                  size: 16,
+                                  color: Color(0xFF3A7BD5),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
 
-                  const SizedBox(height: 14),
-                  const Divider(height: 1, color: Color(0xFFE2E8F0)),
-                  const SizedBox(height: 8),
+                        const SizedBox(height: 14),
+                        const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                        const SizedBox(height: 8),
 
-                  // Habilidades Técnicas expansível
-                  _expandableSection(
-                    label: "Habilidades Técnicas",
-                    count: candidate.technicalSkills.length,
-                    isExpanded: techExpanded,
-                    onTap: () => setState(() {
-                      techExpanded
-                          ? _expandedTech.remove(index)
-                          : _expandedTech.add(index);
-                    }),
-                    skills: candidate.technicalSkills,
-                    tagColor: const Color(0xFFEBF4FF),
-                    tagTextColor: const Color(0xFF2B6CB0),
+                        // Habilidades Técnicas expansível
+                        _expandableSection(
+                          label: "Habilidades Técnicas",
+                          count: candidate.technicalSkills.length,
+                          isExpanded: techExpanded,
+                          onTap: () => setState(() {
+                            techExpanded
+                                ? _expandedTech.remove(index)
+                                : _expandedTech.add(index);
+                          }),
+                          skills: candidate.technicalSkills,
+                          tagColor: const Color(0xFFEBF4FF),
+                          tagTextColor: const Color(0xFF2B6CB0),
+                        ),
+
+                        const SizedBox(height: 4),
+
+                        // Características Pessoais expansível
+                        _expandableSection(
+                          label: "Características Pessoais",
+                          count: candidate.softSkills.length,
+                          isExpanded: softExpanded,
+                          onTap: () => setState(() {
+                            softExpanded
+                                ? _expandedSoft.remove(index)
+                                : _expandedSoft.add(index);
+                          }),
+                          skills: candidate.softSkills,
+                          tagColor: const Color(0xFFF0F4FF),
+                          tagTextColor: const Color(0xFF3730A3),
+                        ),
+                      ],
+                    ),
                   ),
-
-                  const SizedBox(height: 4),
-
-                  // Características Pessoais expansível
-                  _expandableSection(
-                    label: "Características Pessoais",
-                    count: candidate.softSkills.length,
-                    isExpanded: softExpanded,
-                    onTap: () => setState(() {
-                      softExpanded
-                          ? _expandedSoft.remove(index)
-                          : _expandedSoft.add(index);
-                    }),
-                    skills: candidate.softSkills,
-                    tagColor: const Color(0xFFF0F4FF),
-                    tagTextColor: const Color(0xFF3730A3),
-                  ),
-                ],
-              ),
+                );
+              },
             ),
-          );
-        },
-      ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.push(AppRoutes.createCandidate);
-        },
+        onPressed: () => context.push(AppRoutes.createCandidate),
         tooltip: "Criar candidato",
         backgroundColor: const Color(0xFF3A7BD5),
         foregroundColor: Colors.white,
