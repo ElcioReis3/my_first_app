@@ -14,10 +14,38 @@ class HomeScreen extends StatefulWidget {
 class _MyHomeScreenState extends State<HomeScreen> {
   final Set<int> _expandedTech = {};
   final Set<int> _expandedSoft = {};
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  String _filter = 'todos'; // 'todos', 'disponivel', 'indisponivel'
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final candidates = context.watch<CandidateProvider>().candidates;
+
+    final filtered = candidates.where((c) {
+      final matchSearch =
+          _searchQuery.isEmpty ||
+          c.name.toLowerCase().contains(_searchQuery) ||
+          c.email.toLowerCase().contains(_searchQuery) ||
+          c.course.toLowerCase().contains(_searchQuery) ||
+          c.technicalSkills.any(
+            (s) => s.toLowerCase().contains(_searchQuery),
+          ) ||
+          c.softSkills.any((s) => s.toLowerCase().contains(_searchQuery));
+
+      final matchFilter =
+          _filter == 'todos' ||
+          (_filter == 'disponivel' && c.available) ||
+          (_filter == 'indisponivel' && !c.available);
+
+      return matchSearch && matchFilter;
+    }).toList();
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0F4F8),
@@ -40,19 +68,118 @@ class _MyHomeScreenState extends State<HomeScreen> {
             onPressed: () => context.go(AppRoutes.login),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(104),
+          child: Column(
+            children: [
+              // Campo de busca
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: TextField(
+                  controller: _searchController,
+                  style: const TextStyle(fontSize: 13, color: Colors.white),
+                  onChanged: (value) =>
+                      setState(() => _searchQuery = value.toLowerCase()),
+                  decoration: InputDecoration(
+                    hintText: "Buscar candidato...",
+                    hintStyle: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white54,
+                    ),
+                    prefixIcon: const Icon(
+                      Icons.search,
+                      color: Colors.white54,
+                      size: 20,
+                    ),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () => setState(() {
+                              _searchController.clear();
+                              _searchQuery = '';
+                            }),
+                            child: const Icon(
+                              Icons.close,
+                              color: Colors.white54,
+                              size: 18,
+                            ),
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.15),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+
+              // Filtros
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                child: Row(
+                  children: [
+                    _filterChip(
+                      label: "Todos",
+                      value: "todos",
+                      icon: Icons.people_outline,
+                      count: candidates.length,
+                    ),
+                    const SizedBox(width: 8),
+                    _filterChip(
+                      label: "Disponíveis",
+                      value: "disponivel",
+                      icon: Icons.check_circle_outline,
+                      count: candidates.where((c) => c.available).length,
+                    ),
+                    const SizedBox(width: 8),
+                    _filterChip(
+                      label: "Indisponíveis",
+                      value: "indisponivel",
+                      icon: Icons.cancel_outlined,
+                      count: candidates.where((c) => !c.available).length,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-      body: candidates.isEmpty
-          ? const Center(
-              child: Text(
-                "Nenhum candidato cadastrado.",
-                style: TextStyle(fontSize: 14, color: Color(0xFF718096)),
+      body: filtered.isEmpty
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    _searchQuery.isNotEmpty
+                        ? Icons.search_off
+                        : Icons.people_outline,
+                    size: 48,
+                    color: const Color(0xFFCBD5E0),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _searchQuery.isNotEmpty
+                        ? "Nenhum resultado para \"$_searchQuery\""
+                        : "Nenhum candidato nesta categoria.",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF718096),
+                    ),
+                  ),
+                ],
               ),
             )
           : ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              itemCount: candidates.length,
+              itemCount: filtered.length,
               itemBuilder: (context, index) {
-                final candidate = candidates[index];
+                final candidate = filtered[index];
                 final bool isAvailable = candidate.available;
                 final bool techExpanded = _expandedTech.contains(index);
                 final bool softExpanded = _expandedSoft.contains(index);
@@ -81,7 +208,6 @@ class _MyHomeScreenState extends State<HomeScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Cabeçalho
                         Row(
                           children: [
                             CircleAvatar(
@@ -122,7 +248,6 @@ class _MyHomeScreenState extends State<HomeScreen> {
                                 ],
                               ),
                             ),
-                            // Badge disponibilidade
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 10,
@@ -166,11 +291,13 @@ class _MyHomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            // Botão editar
                             GestureDetector(
                               onTap: () => context.push(
                                 AppRoutes.editCandidate,
-                                extra: {'index': index, 'candidate': candidate},
+                                extra: {
+                                  'index': candidates.indexOf(candidate),
+                                  'candidate': candidate,
+                                },
                               ),
                               child: Container(
                                 padding: const EdgeInsets.all(6),
@@ -192,7 +319,6 @@ class _MyHomeScreenState extends State<HomeScreen> {
                         const Divider(height: 1, color: Color(0xFFE2E8F0)),
                         const SizedBox(height: 8),
 
-                        // Habilidades Técnicas expansível
                         _expandableSection(
                           label: "Habilidades Técnicas",
                           count: candidate.technicalSkills.length,
@@ -209,7 +335,6 @@ class _MyHomeScreenState extends State<HomeScreen> {
 
                         const SizedBox(height: 4),
 
-                        // Características Pessoais expansível
                         _expandableSection(
                           label: "Características Pessoais",
                           count: candidate.softSkills.length,
@@ -235,6 +360,68 @@ class _MyHomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF3A7BD5),
         foregroundColor: Colors.white,
         child: const Icon(Icons.person_add),
+      ),
+    );
+  }
+
+  Widget _filterChip({
+    required String label,
+    required String value,
+    required IconData icon,
+    required int count,
+  }) {
+    final bool isSelected = _filter == value;
+
+    return GestureDetector(
+      onTap: () => setState(() => _filter = value),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.white : Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? Colors.white : Colors.transparent,
+            width: 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 13,
+              color: isSelected ? const Color(0xFF1E3A5F) : Colors.white70,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: isSelected ? const Color(0xFF1E3A5F) : Colors.white70,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFF1E3A5F)
+                    : Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "$count",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected ? Colors.white : Colors.white70,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
