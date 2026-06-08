@@ -257,7 +257,7 @@ class _MyHomeScreenState extends State<CreateCandidateScreen> {
                       Switch(
                         value: _available,
                         onChanged: (val) => setState(() => _available = val),
-                        activeColor: const Color(0xFF3A7BD5),
+                        activeThumbColor: const Color(0xFF3A7BD5),
                       ),
                     ],
                   ),
@@ -360,7 +360,7 @@ class _MyHomeScreenState extends State<CreateCandidateScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),
@@ -453,7 +453,7 @@ class _MyHomeScreenState extends State<CreateCandidateScreen> {
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 6,
             offset: const Offset(0, 2),
           ),

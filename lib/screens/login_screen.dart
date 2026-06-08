@@ -177,8 +177,9 @@ class _MyHomeScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) {
                         if (v == null || v.isEmpty) return "Informe a senha";
-                        if (v.length < 6)
+                        if (v.length < 6) {
                           return "A senha deve ter ao menos 6 caracteres";
+                        }
                         return null;
                       },
                       decoration: InputDecoration(
@@ -283,7 +284,7 @@ class _MyHomeScreenState extends State<LoginScreen> {
                           foregroundColor: Colors.white,
                           disabledBackgroundColor: const Color(
                             0xFF3A7BD5,
-                          ).withOpacity(0.6),
+                          ).withValues(alpha: 0.6),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
